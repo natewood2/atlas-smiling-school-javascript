@@ -38,7 +38,8 @@ $(document).ready(function() {
         });
     }
 
-    function loadPopularTutorials() {
+    // this one works 
+    function loadinPopularVids() {
         $.ajax({
             url: "https://smileschool-api.hbtn.info/popular-tutorials",
             method: "GET",
@@ -152,63 +153,134 @@ $(document).ready(function() {
                 $("#carouselPopularTutorials").show();
             },
             error: function() {
-                console.log("Failed to load popular tutorials");
+                console.log("doesnt work");
             }
         });
     }
 
+    // this one doesnt work
     function loadLatestVids() {
         $.ajax({
             url: "https://smileschool-api.hbtn.info/latest-videos",
             method: "GET",
             beforeSend: function() {
                 $("#loader-latest").show();
-                $("#carouselLatestVideos").hide();
+                $("#carouselofLatestvids").hide();
             },
             success: function(data) {
-                let videoHtml = '';
-                data.forEach(function(video, index) {
-                    if (index % 4 === 0) {
-                        videoHtml += `<div class="carousel-item ${index === 0 ? 'active' : ''}"><div class="row">`;
-                    }
-                    videoHtml += `
-                        <div class="col-12 col-sm-6 col-md-3">
-                            <div class="card m-3">
-                                <img src="${video.thumb_url}" class="card-img-top" alt="Video thumbnail" />
-                                <div class="card-img-overlay text-center">
-                                    <img src="images/play.png" alt="Play" width="64px" class="align-self-center play-overlay" />
-                                </div>
-                                <div class="card-body">
-                                    <h5 class="card-title font-weight-bold">${video.title}</h5>
-                                    <p class="card-text text-muted">${video['sub-title']}</p>
-                                    <div class="creator d-flex align-items-center">
-                                        <img src="${video.author_pic_url}" alt="Creator of Video" width="30px" class="rounded-circle" />
-                                        <h6 class="pl-3 m-0 main-color">${video.author}</h6>
-                                    </div>
-                                    <div class="info pt-3 d-flex justify-content-between">
-                                        <div class="rating">
-                                            ${'<img src="images/star_on.png" alt="star on" width="15px" />'.repeat(video.star)}
-                                            ${'<img src="images/star_off.png" alt="star off" width="15px" />'.repeat(5 - video.star)}
-                                        </div>
-                                        <span class="main-color">${video.duration}</span>
-                                    </div>
-                                </div>
+                data.forEach(function(video) {
+                    var videoHtml = `
+                    <div class="card m-3">
+                        <img
+                          src="${video.thumb_url}"
+                          class="card-img-top"
+                          alt="Video thumbnail"
+                        />
+                        <div class="card-img-overlay text-center">
+                          <img
+                            src="images/play.png"
+                            alt="Play"
+                            width="64px"
+                            class="align-self-center play-overlay"
+                          />
+                        </div>
+                        <div class="card-body">
+                          <h5 class="card-title font-weight-bold">
+                            ${video.title}
+                          </h5>
+                          <p class="card-text text-muted">
+                            ${video['sub-title']}
+                          </p>
+                          <div class="creator d-flex align-items-center">
+                            <img
+                              src="${video.author_pic_url}"
+                              alt="Creator of Video"
+                              width="30px"
+                              class="rounded-circle"
+                            />
+                            <h6 class="pl-3 m-0 main-color">${video.author}</h6>
+                          </div>
+                          <div class="info pt-3 d-flex justify-content-between">
+                            <div class="rating">
+                              <img
+                                src="images/star_on.png"
+                                alt="star on"
+                                width="15px"
+                              />
+                              <img
+                                src="images/star_on.png"
+                                alt="star on"
+                                width="15px"
+                              />
+                              <img
+                                src="images/star_on.png"
+                                alt="star on"
+                                width="15px"
+                              />
+                              <img
+                                src="images/star_on.png"
+                                alt="star on"
+                                width="15px"
+                              />
+                              <img
+                                src="images/star_off.png"
+                                alt="star on"
+                                width="15px"
+                              />
                             </div>
-                        </div>`;
+                            <span class="main-color">${video.duration}</span>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                    $("#loading-lastest-vids").append(videoHtml);
                 });
-                $("#latest-videos").html(videoHtml);
+    
+                $("#loading-lastest-vids").slick({
+                    slidesToShow: 4,
+                    slidesToScroll: 1,
+                    autoplay: true,
+                    autoplaySpeed: 2000,
+                    responsive: [
+                        {
+                            breakpoint: 1024,
+                            settings: {
+                                slidesToShow: 3,
+                                slidesToScroll: 1,
+                                infinite: true,
+                                dots: true
+                            }
+                        },
+                        {
+                            breakpoint: 600,
+                            settings: {
+                                slidesToShow: 2,
+                                slidesToScroll: 1
+                            }
+                        },
+                        {
+                            breakpoint: 480,
+                            settings: {
+                                slidesToShow: 1,
+                                slidesToScroll: 1
+                            }
+                        }
+                    ]
+                });
             },
             complete: function() {
                 $("#loader-latest").hide();
-                $("#carouselLatestVideos").show();
+                $("#carouselofLatestvids").show();
             },
             error: function() {
-                console.log("Failed to load latest videos");
+                console.log("doesnt work");
             }
         });
     }
 
-    loadQuotes();
-    loadPopularTutorials();
-    loadLatestVids();
+    $(document).ready(function() {
+        loadQuotes();
+        loadinPopularVids();
+        loadLatestVids();
+    });
 });
