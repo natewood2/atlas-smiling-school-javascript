@@ -48,6 +48,7 @@ $(document).ready(function() {
                 $("#carouselPopularTutorials").hide();
             },
             success: function(data) {
+                // thank u slick
                 data.forEach(function(video) {
                     var videoHtml = `
                     <div class="card m-3">
@@ -375,7 +376,7 @@ $(document).ready(function() {
                 $('#courses-results').show();
             },
             error: function() {
-                console.log("is currently failing hard");
+                console.log("is currently failing");
             }
         });
     }
