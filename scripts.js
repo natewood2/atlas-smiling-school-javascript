@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    function loadQuotes() {
+    function loadinQuotes() {
         $.ajax({
             url: "https://smileschool-api.hbtn.info/quotes",
             method: "GET",
@@ -33,7 +33,7 @@ $(document).ready(function() {
                 $("#carouselExampleControls").show();
             },
             error: function() {
-                console.log("Failed to load quotes");
+                console.log("doesn't wrk");
             }
         });
     }
@@ -159,7 +159,7 @@ $(document).ready(function() {
     }
 
     // this one doesnt work
-    function loadLatestVids() {
+    function loadinLatestVids() {
         $.ajax({
             url: "https://smileschool-api.hbtn.info/latest-videos",
             method: "GET",
@@ -279,8 +279,125 @@ $(document).ready(function() {
     }
 
     $(document).ready(function() {
-        loadQuotes();
+        loadinQuotes();
         loadinPopularVids();
-        loadLatestVids();
+        loadinLatestVids();
     });
+});
+
+// starting courses functions
+$(document).ready(function() {
+    let searchKeywords = '';
+    let selectedTopic = 'All';
+    let selectedSort = 'Most Popular';
+
+    // fixed synta 
+    const fixinNames = {
+        "most_popular": "Most Popular",
+        "most_recent": "Most Recent",
+        "most_viewed": "Most Viewed"
+    };
+
+    function capitalizeWords(str) {
+        return str.replace(/\b\w/g, char => char.toUpperCase());
+    }
+    function loadinThoseDropdowns() {
+        $.ajax({
+            url: "https://smileschool-api.hbtn.info/courses",
+            method: "GET",
+            success: function(data) {
+                let topicsHtml = '<a class="dropdown-item" href="#" data-topic="All">All</a>';
+                let topicsSet = new Set(data.topics.map(topic => capitalizeWords(topic)));
+                topicsSet.delete('All')
+                topicsSet.forEach(topic => {
+                    topicsHtml += `<a class="dropdown-item" href="#" data-topic="${topic}">${topic}</a>`;
+                });
+                $('#topic-dropdown').html(topicsHtml);
+
+                let sortHtml = '';
+                data.sorts.forEach(sort => {
+                    sortHtml += `<a class="dropdown-item" href="#" data-sort="${sort}">${fixinNames[sort]}</a>`;
+                });
+                $('#sort-dropdown').html(sortHtml);
+            }
+        });
+    }
+
+    // loading from the api 
+    function loadinThoseCourses() {
+        $('#courses-loader').show();
+        $('#courses-results').hide();
+
+        $.ajax({
+            url: "https://smileschool-api.hbtn.info/courses",
+            method: "GET",
+            data: {
+                q: searchKeywords,
+                topic: selectedTopic,
+                sort: selectedSort
+            },
+            success: function(data) {
+                let videoCount = data.courses.length;
+                $('.video-count').text(`${videoCount} videos`);
+
+                let coursesHtml = '';
+                data.courses.forEach(course => {
+                    let stars = '';
+                    for (let i = 1; i <= 5; i++) {
+                        stars += `<img src="images/${i <= course.star ? 'star_on' : 'star_off'}.png" alt="star ${i <= course.star ? 'on' : 'off'}" width="15px" />`;
+                    }
+
+                    coursesHtml += `
+                    <div class="col-12 col-sm-4 col-lg-3 d-flex justify-content-center">
+                        <div class="card">
+                            <img src="${course.thumb_url}" class="card-img-top" alt="Video thumbnail" />
+                            <div class="card-img-overlay text-center">
+                                <img src="images/play.png" alt="Play" width="64px" class="align-self-center play-overlay" />
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title font-weight-bold">${course.title}</h5>
+                                <p class="card-text text-muted">${course['sub-title']}</p>
+                                <div class="creator d-flex align-items-center">
+                                    <img src="${course.author_pic_url}" alt="Creator of Video" width="30px" class="rounded-circle" />
+                                    <h6 class="pl-3 m-0 main-color">${course.author}</h6>
+                                </div>
+                                <div class="info pt-3 d-flex justify-content-between">
+                                    <div class="rating">${stars}</div>
+                                    <span class="main-color">${course.duration}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                $('#courses-results').html(coursesHtml);
+                $('#courses-loader').hide();
+                $('#courses-results').show();
+            },
+            error: function() {
+                console.log("is currently failing hard");
+            }
+        });
+    }
+
+    // finally working
+    $('#search-keywords').on('input', function() {
+        searchKeywords = $(this).val();
+        loadinThoseCourses();
+    });
+
+    $('#topic-dropdown').on('click', 'a', function() {
+        selectedTopic = $(this).data('topic');
+        $('#selected-topic').text(selectedTopic);
+        loadinThoseCourses();
+    });
+
+    $('#sort-dropdown').on('click', 'a', function() {
+        selectedSort = $(this).data('sort');
+        $('#selected-sort').text(fixinNames[selectedSort]);
+        loadinThoseCourses();
+    });
+
+    loadinThoseDropdowns();
+    loadinThoseCourses();
 });
